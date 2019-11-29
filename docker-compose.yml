@@ -1,0 +1,40 @@
+version: '3'
+services:
+  api:
+    build:
+      context: .
+      dockerfile: ./docker/api-prod/Dockerfile
+    container_name: stock_control_api
+    image: 003865194525.dkr.ecr.us-east-1.amazonaws.com/stock-control-api:${API_TAG}
+    networks:
+      stock_control:
+        aliases:
+          - api
+  nginx:
+    build:
+      context: .
+      dockerfile: ./docker/nginx/Dockerfile
+    container_name: stock_control_nginx
+    image: 003865194525.dkr.ecr.us-east-1.amazonaws.com/stock-control-nginx:${NGINX_TAG}
+    ports:
+      - "8000:80"
+    networks:
+      stock_control:
+        aliases:
+          - nginx
+  db:
+    image: mysql:5.7.28
+    container_name: stock_control_db
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=stock_control
+      - MYSQL_USER=stock
+      - MYSQL_PASSWORD=stock
+    networks:
+      stock_control:
+        aliases:
+          - db
+networks:
+  stock_control:
